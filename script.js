@@ -1,5 +1,6 @@
 let totalScore = 0;
 let numberOfThrows = 0;
+const MAX_SCORE = 180;
 
 const totalScoreElement = document.getElementById('total-score');
 const averageScoreElement = document.getElementById('average-score');
@@ -9,10 +10,23 @@ let currentInput = '';
 
 const currentScoreElement = document.getElementById('current-score');
 
+document.addEventListener('touchstart', function(event) {
+    if (event.touches.length > 1) {
+        event.preventDefault();
+    }
+}, { passive: false });
+
 numberButtons.forEach(button => {
     button.addEventListener('click', () => {
-        currentInput += button.textContent;
-        currentScoreElement.value = currentInput;
+        if (currentInput.length < 3) {
+            currentInput += button.textContent;
+            const score = parseInt(currentInput, 10);
+            if (score <= MAX_SCORE) {
+                currentScoreElement.value = currentInput;
+            } else {
+                currentInput = currentInput.slice(0, -1);
+            }
+        }
     });
 });
 
@@ -20,15 +34,17 @@ const submitScoreButton = document.getElementById('submit-score');
 submitScoreButton.addEventListener('click', () => {
     if (currentInput !== '') {
         const score = parseInt(currentInput, 10);
-        totalScore += score;
-        numberOfThrows++;
-        const averageScore = (totalScore / numberOfThrows).toFixed(2);
+        if (score <= MAX_SCORE) {
+            totalScore += score;
+            numberOfThrows++;
+            const averageScore = (totalScore / numberOfThrows).toFixed(2);
 
-        totalScoreElement.textContent = totalScore;
-        averageScoreElement.textContent = averageScore;
-        numberOfThrowsElement.textContent = numberOfThrows;
+            totalScoreElement.textContent = totalScore;
+            averageScoreElement.textContent = averageScore;
+            numberOfThrowsElement.textContent = numberOfThrows;
 
-        currentInput = '';
-        currentScoreElement.value = '';
+            currentInput = '';
+            currentScoreElement.value = '';
+        }
     }
 }); 
